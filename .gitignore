@@ -1,0 +1,10 @@
+# Personal data stays on this Mac: recipes, crate backups, charts, logs
+data/
+sets/
+*.log
+
+# Build output and dependencies
+dist/
+node_modules/
+
+.DS_Store

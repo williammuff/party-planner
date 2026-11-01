@@ -1,0 +1,19 @@
+{
+  "name": "party-planner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Plans DJ sets from your Serato library and suggests what to play next. Local, Mac desktop app.",
+  "scripts": {
+    "start": "node server.js",
+    "app": "env -u ELECTRON_RUN_AS_NODE electron ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "electron": "44.5.1"
+  },
+  "main": "electron/main.js",
+  "updateRepo": "williammuff/party-planner"
+}

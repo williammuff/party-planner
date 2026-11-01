@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Party Planner</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Party Planner</div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="build" id="tabBuild">Set builder</button>
+      <button role="tab" data-tab="next" id="tabNext">What to play next <span class="live-dot" id="liveDot" hidden></span></button>
+    </nav>
+    <div class="top-status">
+      <button class="update-pill" id="updatePill" hidden title="A new version of Party Planner is ready"></button>
+      <span class="serato-pill" id="seratoPill" title="Serato status"><span class="dot"></span><span id="seratoPillText">Serato</span></span>
+      <button class="ghost small" id="infoBtn" title="Library stats, chart data, reload">ⓘ Library &amp; charts</button>
+    </div>
+  </header>
+
+  <div class="modal" id="infoModal" hidden>
+    <div class="modal-box info-box" role="dialog" aria-labelledby="infoTitle">
+      <div class="card-head">
+        <h2 id="infoTitle">Library &amp; charts</h2>
+        <button class="ghost small info-close" id="infoClose">Close</button>
+      </div>
+      <h3>Serato library</h3>
+      <div class="info-lines" id="libStats">Loading library…</div>
+      <div class="serato-status" id="seratoStatus"></div>
+      <h3>App</h3>
+      <div class="info-lines" id="updateInfo">Version info unavailable in a browser tab.</div>
+      <div class="update-notes" id="updateNotes" hidden></div>
+      <div class="row">
+        <button class="ghost small" id="updateCheckBtn" hidden>Check for updates</button>
+        <button class="primary small" id="updateInstallBtn" hidden>Install &amp; restart</button>
+      </div>
+      <h3>Charts</h3>
+      <div class="info-lines" id="chartStatus"></div>
+      <div class="row end">
+        <button class="ghost" id="chartsBtn" title="Download the latest Billboard Hot 100 history and today's iTunes Top Songs">Update charts</button>
+        <button class="ghost" id="reloadBtn" title="Re-read the Serato library from disk">Reload library</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="layout">
+    <section class="planner">
+      <div class="card prompt-card build-only">
+        <label for="prompt" class="label">Describe the party</label>
+        <textarea id="prompt" rows="3" placeholder="e.g. house vibe w/ hip hop 90's 2000's, 3 hours, crowd pleasers"></textarea>
+        <div class="examples" id="examples"></div>
+        <div class="presets" id="presets" hidden></div>
+        <div class="row end">
+          <button class="primary" id="planBtn">Plan set</button>
+        </div>
+      </div>
+
+      <div class="card nextup-card next-only" id="nextCard">
+        <div class="card-head">
+          <h2>What to play next</h2>
+          <span class="hint" id="npStatus">Watching Serato…</span>
+          <button class="ghost small" id="npRefresh" title="Re-read Serato's decks now and refresh suggestions">⟳ Refresh decks</button>
+        </div>
+        <div id="npBody">
+          <div class="np-decks" id="npDecks"></div>
+          <div class="np-seed" id="npSeed"></div>
+          <div class="row">
+            <input id="npText" type="text" placeholder="Optional vibe or keywords: go harder · switch to house · bay area throwbacks · chart hits r&b">
+            <button class="ghost" id="npShuffle" title="Different picks from the strong candidates (weighted toward the best fits)">⟳ Shuffle</button>
+            <button class="primary" id="npBtn">Suggest</button>
+          </div>
+          <div class="dials" id="npDials">
+            <div class="dials-head">
+              <span class="dials-title">Dials</span>
+              <span class="dial-presets" id="npPresets"></span>
+            </div>
+            <div class="dials-grid" id="npDialGrid"></div>
+          </div>
+          <div class="np-listbar">
+            <div class="hint np-parsed" id="npParsed"></div>
+            <span class="seg" id="npSort" title="Order of the suggestions">
+              <button data-sort="match">Best match</button>
+              <button data-sort="pop">Popularity</button>
+            </span>
+          </div>
+          <ul class="cands np-list" id="npList"></ul>
+        </div>
+      </div>
+
+      <div class="card set-card build-only" id="setCard" hidden>
+        <div class="recipe">
+          <div class="recipe-title">Recipe</div>
+          <div class="globals">
+          <label>Tracks <input type="number" id="count" min="5" max="200"></label>
+          <label>Energy
+            <select id="energy">
+              <option value="build">Build → peak → land</option>
+              <option value="warmup">Warm-up (rising)</option>
+              <option value="peak">Peak time</option>
+              <option value="chill">Chill / background</option>
+            </select>
+          </label>
+          <label>Crowd
+            <select id="popularity">
+              <option value="hits">Crowd pleasers</option>
+              <option value="balanced">Balanced</option>
+              <option value="deep">Deep cuts</option>
+            </select>
+          </label>
+          <label>BPM <input type="number" id="bpmLo" placeholder="min"> – <input type="number" id="bpmHi" placeholder="max"></label>
+          <label class="check"><input type="checkbox" id="clean"> Clean versions</label>
+          <label>Exclude <select id="exclude" multiple size="1"></select></label>
+        </div>
+        <div class="row end recipe-actions">
+          <span class="preset-save">
+            <input id="presetName" type="text" placeholder="Name this recipe…">
+            <button class="ghost" id="savePresetBtn" title="Save the brief, all settings and the exact tracks in this set">Save recipe</button>
+            <button class="ghost" id="saveAsNewBtn" hidden title="Save a copy under the name above">Save as new</button>
+          </span>
+          <button class="ghost" id="shuffleBtn" title="Same brief, different picks for every pillar">Shuffle all</button>
+          <button class="primary" id="rebuildBtn">Rebuild set</button>
+        </div>
+        </div>
+        <div class="card-head">
+          <h2>Set preview</h2>
+          <div class="set-summary" id="setSummary"></div>
+        </div>
+        <div class="set-tools">
+          <button class="ghost small" id="resequenceBtn" title="Re-order for smooth BPM/key flow">Re-order for flow</button>
+          <button class="ghost small" id="skimBtn" title="Play each track for a few seconds from its first hot cue">▶ Skim the set</button>
+          <label class="small">Skim length <select id="skimLen"><option>10</option><option selected>20</option><option>30</option><option>45</option></select>s</label>
+        </div>
+        <ol class="setlist" id="setlist"></ol>
+        <button class="ghost small add-pillar" id="addBucket">+ Add a pillar</button>
+
+        <div class="save-bar">
+          <label>Crate name <input id="crateName" type="text"></label>
+          <label>Inside <select id="crateParent"></select></label>
+          <button class="primary" id="saveBtn">Save crate to Serato</button>
+        </div>
+        <div class="save-msg" id="saveMsg" hidden></div>
+      </div>
+    </section>
+
+    <aside class="drawer build-only" id="drawer" hidden>
+      <div class="drawer-head">
+        <h3 id="drawerTitle">Swap</h3>
+        <button class="ghost small" id="drawerClose">Close</button>
+      </div>
+      <input id="search" type="search" placeholder="Search your library to add a track…">
+      <div class="drawer-sub" id="drawerSub"></div>
+      <ul class="cands" id="cands"></ul>
+    </aside>
+  </main>
+
+  <footer class="player" id="player">
+    <div class="now">
+      <div class="now-title" id="nowTitle">Nothing loaded</div>
+      <div class="now-meta" id="nowMeta">Click ▶ on any track to preview it</div>
+    </div>
+    <div class="deck">
+      <div class="wave-wrap">
+        <canvas id="overview" height="56"></canvas>
+      </div>
+      <div class="transport">
+        <button class="ghost icon" id="prevBtn" title="Previous track (←)">⏮</button>
+        <button class="primary icon" id="playBtn" title="Play/pause (space)">▶</button>
+        <button class="ghost icon" id="nextBtn" title="Next track (→)">⏭</button>
+        <span class="time" id="time">0:00 / 0:00</span>
+        <div class="cues" id="cues"></div>
+      </div>
+    </div>
+    <audio id="audio" preload="auto"></audio>
+  </footer>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box">
+      <p id="modalText"></p>
+      <div class="row end">
+        <button class="ghost" id="modalCancel">Cancel</button>
+        <button class="primary" id="modalOk">Overwrite</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
