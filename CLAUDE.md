@@ -16,7 +16,7 @@ Run `./scripts/install.sh`. It rebuilds `/Applications/Party Planner.app` from t
 
 ## Releases and auto-update
 
-`./scripts/release.sh [patch|minor|major] "notes"` publishes a version: bumps `package.json`, builds the zip + `.sha256`, commits, tags, pushes, creates the GitHub Release on `updateRepo`, and reinstalls the local app. Installed copies (the user's and friends') check that repo's latest Release at launch and every 6 hours (`electron/updater.js`), verify the checksum and signature, swap themselves and relaunch. Only release when the user asks; commit their changes first (the script requires a clean tree).
+`./scripts/release.sh [patch|minor|major] "notes" [--full]` publishes a version: bumps `package.json`, builds, commits, tags, pushes, creates a GitHub Release carrying only the code update (`Party-Planner-update.zip` + `.sha256` + `Party-Planner-update.json` naming the Electron version), refreshes the `installer` pre-release (full ~125 MB app) only when Electron changed or `--full` is passed, then reinstalls the local app. Installed copies check the latest Release at launch and every 6 hours (`electron/updater.js`): code-only swap of `Contents/Resources/app` when Electron matches, else the full app from `installer`; checksums verified, bundle re-signed ad hoc, rollback on failure. Only release when the user asks (each publish is public); commit their changes first (the script requires a clean tree). Testing a second copy while the real app is open needs `--user-data-dir` (single-instance lock).
 
 ## Electron
 

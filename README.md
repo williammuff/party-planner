@@ -86,9 +86,15 @@ It's signed ad hoc, not with an Apple Developer ID, so the first launch needs ri
 
 ## Updates
 
-The installed app updates itself from this repo's GitHub Releases: it checks at launch and every 6 hours (or **ⓘ → Check for updates**), shows **⬆ Update to x.y.z** in the top bar when there's a new version, then downloads it, verifies its SHA-256 checksum and signature, replaces itself and relaunches. Your data isn't touched.
+**First install** (any Apple Silicon Mac): download the full app from the permanent installer link, https://github.com/williammuff/party-planner/releases/download/installer/Party-Planner-mac-arm64.zip, unzip it, drag **Party Planner.app** into Applications, and right-click → Open the first time.
 
-To publish a version: commit your changes, then `./scripts/release.sh patch "What changed"` (or `minor` / `major`). Needs the GitHub CLI (`brew install gh`, `gh auth login`).
+**After that it updates itself.** It checks this repo's latest Release at launch and every 6 hours (or **ⓘ → Check for updates**), shows **⬆ Update to x.y.z** in the top bar, and installs when you click it:
+- Usually that's a **code-only update** of under 1 MB: just the app's own files are swapped inside the existing app.
+- When a release needs a newer Electron, it downloads the full app from the installer release instead.
+
+Every download is checked against its published SHA-256, the app is re-signed and verified, and a failed swap is rolled back. Your data isn't touched.
+
+**Publishing:** commit your changes, then `./scripts/release.sh patch "What changed"` (or `minor` / `major`). Each release uploads only the small code update. The ~125 MB installer is re-uploaded only when Electron changes, or with `--full` to give new installs a newer starting version. Needs the GitHub CLI (`brew install gh`, `gh auth login`).
 
 ## Keys
 

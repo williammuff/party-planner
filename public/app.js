@@ -124,7 +124,7 @@ function renderUpdate(u) {
   const busy = UPDATE_BUSY[u.state];
   const when = u.checkedAt ? ` (checked ${new Date(u.checkedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })})` : '';
   const line = busy
-    || (u.state === 'available' ? `Version ${u.latestVersion} is available. You have ${u.currentVersion}.`
+    || (u.state === 'available' ? `Version ${u.latestVersion} is available (${u.size === 'code' ? 'quick update' : 'full download, about 125 MB'}). You have ${u.currentVersion}.`
       : u.state === 'current' ? `Version ${u.currentVersion} · up to date${when}${u.message ? ` · ${u.message}` : ''}`
         : u.state === 'error' ? `Version ${u.currentVersion} · ${u.message}`
           : u.message ? `Version ${u.currentVersion} · ${u.message}` : `Version ${u.currentVersion}`);

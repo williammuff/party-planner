@@ -90,3 +90,14 @@ TXT
 
 ditto -c -k --keepParent "$STAGE" "$DIST/Party Planner.zip"
 echo "Built: $DIST/Party Planner.zip ($(du -h "$DIST/Party Planner.zip" | cut -f1))"
+
+# Code-only update: just the app's own files (no Electron runtime, no seed data), plus a manifest
+# saying which Electron it needs. Installed copies on that Electron swap only these files.
+ELECTRON_VERSION="$(cat "$PROJECT/node_modules/electron/dist/version")"
+UPD="$WORK/update"
+mkdir -p "$UPD"
+( cd "$APPDIR" && cp -R package.json server.js lib public electron "$UPD/" )
+( cd "$UPD" && ditto -c -k . "$DIST/Party-Planner-update.zip" )
+node -e "require('fs').writeFileSync(process.argv[1], JSON.stringify({ version: process.argv[2], electron: process.argv[3] }, null, 2) + '\\n')" \
+  "$DIST/Party-Planner-update.json" "$VERSION" "$ELECTRON_VERSION"
+echo "Built: $DIST/Party-Planner-update.zip ($(du -h "$DIST/Party-Planner-update.zip" | cut -f1), Electron $ELECTRON_VERSION)"
